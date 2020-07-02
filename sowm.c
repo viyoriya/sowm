@@ -222,8 +222,7 @@ void map_request(XEvent *e) {
 
    XSetWindowBorder(d, w, get_border_color()); 
    XConfigureWindow(d, w, CWBorderWidth, &(XWindowChanges){.border_width = BORDER_WIDTH}); 
-   XConfigureWindow(d, w, CWStackMode, &(XWindowChanges){.stack_mode = Opposite}); 
-//   XConfigureWindow(d, w, CWStackMode, &(XWindowChanges){.stack_mode = MODE_V}); 
+//   XConfigureWindow(d, w, CWStackMode, &(XWindowChanges){.stack_mode = Opposite}); 
 
    if (wx + wy == 0) win_center((Arg){0});
 //    if (wx + wy == 0) win_fs((Arg){0});
