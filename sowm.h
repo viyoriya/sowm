@@ -56,5 +56,5 @@ void ws_go(const Arg arg);
 
 static int xerror() { return 0; }
 void sowmkill(const Arg arg);
-unsigned long getcolor(const char *col);
-
+void ws_rotate(const Arg arg);
+unsigned long get_border_color(void);

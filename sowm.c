@@ -8,13 +8,15 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #include "sowm.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
-static int          s; //Added by vj
+static int          s; //Modified main method for Border Patch
 
 static Display      *d;
 static XButtonEvent mouse;
@@ -130,27 +132,22 @@ void win_center(const Arg arg) {
     if (!cur) return;
 
     win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
-    XMoveWindow(d, cur->w, (sw - ww) / 2 , (sh - wh) / 2 );
+//    XMoveWindow(d, cur->w, (sw - ww) / 2 , (sh - wh) / 2 );
 
-//    win_size(cur->w, &(int){0},&(int){PANEL_HEIGHT}, &(int){sw},&(int){sh});
-//    XMoveWindow(d, cur->w, 0, PANEL_HEIGHT );
-//    //    XMoveResizeWindow(d, cur->w, sw/4, sh/4, sw/2 , sh/2 );
+    XMoveResizeWindow(d, cur->w, sw/4, sh/4, sw/2 , sh/2 );
+//    XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, sw*0.50 , sh);
 
 }
 
 void win_fs(const Arg arg) {
     if (!cur) return;
 
-    if ((cur->f = cur->f ? 0 : 1)) {
+//    if ((cur->f = cur->f ? 0 : 1)) {
         win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
         XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, sw, sh );         
-
-    } else {
-        XMoveResizeWindow(d, cur->w,0, PANEL_HEIGHT, cur->ww, cur->wh);
-    //        XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);
-    //        XMoveResizeWindow(d, cur->w,0, PANEL_HEIGHT, cur->ww-(2*BORDER_WIDTH), cur->wh-(2*BORDER_WIDTH));
-
-    }
+//    } else {
+//          XMoveResizeWindow(d, cur->w,0, PANEL_HEIGHT, cur->ww, cur->wh);
+//    }
 }
 
 void win_to_ws(const Arg arg) {
@@ -212,7 +209,8 @@ void configure_request(XEvent *e) {
         .width      = ev->width,
         .height     = ev->height,
         .sibling    = ev->above,
-        .stack_mode = ev->detail
+        .stack_mode = ev->detail,
+        .border_width = ev->border_width
     });
 }
 
@@ -224,12 +222,13 @@ void map_request(XEvent *e) {
     win_add(w);
     cur = list->prev;
 
-   XSetWindowBorder(d, w, getcolor(BORDER_COLOR)); //Added bu vj 
-   XConfigureWindow(d, w, CWBorderWidth, &(XWindowChanges){.border_width = BORDER_WIDTH}); //Added by vj
+   XSetWindowBorder(d, w, get_border_color()); 
+   XConfigureWindow(d, w, CWBorderWidth, &(XWindowChanges){.border_width = BORDER_WIDTH}); 
+   XConfigureWindow(d, w, CWStackMode, &(XWindowChanges){.stack_mode = Opposite}); 
+//   XConfigureWindow(d, w, CWStackMode, &(XWindowChanges){.stack_mode = MODE_V}); 
 
    if (wx + wy == 0) win_center((Arg){0});
-//vj    if (wx + wy == 0) win_fs((Arg){0});
-
+//    if (wx + wy == 0) win_fs((Arg){0});
 
     XMapWindow(d, w);
     win_focus(list->prev);
@@ -277,7 +276,7 @@ int main(void) {
     signal(SIGCHLD, SIG_IGN);
     XSetErrorHandler(xerror);
 
-    int s = DefaultScreen(d);
+    s = DefaultScreen(d);
     root  = RootWindow(d, s);
     sw    = XDisplayWidth(d, s) - (2*BORDER_WIDTH);
     sh    = XDisplayHeight(d, s) - PANEL_HEIGHT-(2*BORDER_WIDTH);
@@ -295,8 +294,16 @@ void sowmkill(const Arg arg) {
         exit(1);
 }
 
-unsigned long getcolor(const char *col) {
-    Colormap m = DefaultColormap(d, s);
-    XColor c;
-    return (!XAllocNamedColor(d, m, col, &c, &c))?0:c.pixel;
+void ws_rotate(const Arg arg) {
+    Arg a = {.i = (ws + DESKTOPS + arg.i) % DESKTOPS};
+    ws_go(a);
+
 }
+
+unsigned long get_border_color() {
+    Colormap m = DefaultColormap(d,s); 
+    XColor c;
+    return (!XAllocNamedColor(d, m, BORDER_COLOR, &c, &c))?0:c.pixel;
+}
+
+

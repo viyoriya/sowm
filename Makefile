@@ -1,5 +1,5 @@
 CFLAGS += -std=c99 -Wall -Wextra -pedantic -Wold-style-declaration
-CFLAGS += -Wmissing-prototypes -Wno-unused-parameter
+CFLAGS += -Wmissing-prototypes -Wno-unused-parameter -Wno-missing-field-initializers
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 CC     ?= gcc
