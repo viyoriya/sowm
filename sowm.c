@@ -14,6 +14,8 @@ static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
+static int          s; //Added by vj
+
 static Display      *d;
 static XButtonEvent mouse;
 static Window       root;
@@ -128,7 +130,12 @@ void win_center(const Arg arg) {
     if (!cur) return;
 
     win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
-    XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+    XMoveWindow(d, cur->w, (sw - ww) / 2 , (sh - wh) / 2 );
+
+//    win_size(cur->w, &(int){0},&(int){PANEL_HEIGHT}, &(int){sw},&(int){sh});
+//    XMoveWindow(d, cur->w, 0, PANEL_HEIGHT );
+//    //    XMoveResizeWindow(d, cur->w, sw/4, sh/4, sw/2 , sh/2 );
+
 }
 
 void win_fs(const Arg arg) {
@@ -136,11 +143,13 @@ void win_fs(const Arg arg) {
 
     if ((cur->f = cur->f ? 0 : 1)) {
         win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
-        XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, sw, sh);
+        XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, sw, sh );         
 
     } else {
-        /*XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);*/
-        XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, cur->ww, cur->wh);
+        XMoveResizeWindow(d, cur->w,0, PANEL_HEIGHT, cur->ww, cur->wh);
+    //        XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);
+    //        XMoveResizeWindow(d, cur->w,0, PANEL_HEIGHT, cur->ww-(2*BORDER_WIDTH), cur->wh-(2*BORDER_WIDTH));
+
     }
 }
 
@@ -215,8 +224,11 @@ void map_request(XEvent *e) {
     win_add(w);
     cur = list->prev;
 
-//vj    if (wx + wy == 0) win_center((Arg){0});
-    if (wx + wy == 0) win_fs((Arg){0});
+   XSetWindowBorder(d, w, getcolor(BORDER_COLOR)); //Added bu vj 
+   XConfigureWindow(d, w, CWBorderWidth, &(XWindowChanges){.border_width = BORDER_WIDTH}); //Added by vj
+
+   if (wx + wy == 0) win_center((Arg){0});
+//vj    if (wx + wy == 0) win_fs((Arg){0});
 
 
     XMapWindow(d, w);
@@ -267,8 +279,8 @@ int main(void) {
 
     int s = DefaultScreen(d);
     root  = RootWindow(d, s);
-    sw    = XDisplayWidth(d, s);
-    sh    = XDisplayHeight(d, s) - PANEL_HEIGHT;
+    sw    = XDisplayWidth(d, s) - (2*BORDER_WIDTH);
+    sh    = XDisplayHeight(d, s) - PANEL_HEIGHT-(2*BORDER_WIDTH);
 
     XSelectInput(d,  root, SubstructureRedirectMask);
     XDefineCursor(d, root, XCreateFontCursor(d, 68));
@@ -283,4 +295,8 @@ void sowmkill(const Arg arg) {
         exit(1);
 }
 
-
+unsigned long getcolor(const char *col) {
+    Colormap m = DefaultColormap(d, s);
+    XColor c;
+    return (!XAllocNamedColor(d, m, col, &c, &c))?0:c.pixel;
+}

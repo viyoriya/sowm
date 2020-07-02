@@ -56,5 +56,5 @@ void ws_go(const Arg arg);
 
 static int xerror() { return 0; }
 void sowmkill(const Arg arg);
-
+unsigned long getcolor(const char *col);
 

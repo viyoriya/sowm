@@ -4,6 +4,8 @@
 #define MOD Mod4Mask
 
 #define PANEL_HEIGHT    18
+#define BORDER_COLOR    "#956671"
+#define BORDER_WIDTH    2
 
 const char dmenufont[]       = "Iosevka:style=Bold:pixelsize=12"; 
 const char col_gray1[]       = "#2E3440";
