@@ -8,8 +8,6 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include <stdio.h>
-
 #include "sowm.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
