@@ -105,7 +105,6 @@ void win_add(Window w) {
 
     ws_save(ws);
 }
-
 void win_del(Window w) {
     client *x = 0;
 
@@ -137,10 +136,11 @@ void win_fs(const Arg arg) {
 
     if ((cur->f = cur->f ? 0 : 1)) {
         win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
-        XMoveResizeWindow(d, cur->w, 0, 0, sw, sh);
+        XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, sw, sh);
 
     } else {
-        XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);
+        /*XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);*/
+        XMoveResizeWindow(d, cur->w, 0, PANEL_HEIGHT, cur->ww, cur->wh);
     }
 }
 
@@ -215,7 +215,9 @@ void map_request(XEvent *e) {
     win_add(w);
     cur = list->prev;
 
-    if (wx + wy == 0) win_center((Arg){0});
+//vj    if (wx + wy == 0) win_center((Arg){0});
+    if (wx + wy == 0) win_fs((Arg){0});
+
 
     XMapWindow(d, w);
     win_focus(list->prev);
@@ -266,7 +268,7 @@ int main(void) {
     int s = DefaultScreen(d);
     root  = RootWindow(d, s);
     sw    = XDisplayWidth(d, s);
-    sh    = XDisplayHeight(d, s);
+    sh    = XDisplayHeight(d, s) - PANEL_HEIGHT;
 
     XSelectInput(d,  root, SubstructureRedirectMask);
     XDefineCursor(d, root, XCreateFontCursor(d, 68));
@@ -275,3 +277,10 @@ int main(void) {
     while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
         if (events[ev.type]) events[ev.type](&ev);
 }
+
+void sowmkill(const Arg arg) {
+        XCloseDisplay(d);
+        exit(1);
+}
+
+

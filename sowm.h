@@ -55,3 +55,6 @@ void win_to_ws(const Arg arg);
 void ws_go(const Arg arg);
 
 static int xerror() { return 0; }
+void sowmkill(const Arg arg);
+
+
