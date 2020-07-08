@@ -15,7 +15,7 @@ const char col_gray3[]       = "#929496";
 const char col_gray4[]       = "#010b13"; 
 const char col_cyan[]        = "#7d7f82"; 
 
-const char* dmenucmd[]		= { "dmenu_run","-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, 0 };
+const char* dmenucmd[]		= { "dmenu_run", "-p", "Find", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, 0 };
 const char* termcmd[]       = { "st",0};
 const char* chromecmd[]     = { "google-chrome-stable", 0 };
 const char* rangercmd[]     = { "st","-e","ranger", 0 };
